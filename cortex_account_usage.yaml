@@ -1,0 +1,486 @@
+name: cortex_acct_usage
+tables:
+  - name: QUERY_HISTORY_VIEW
+    description: This view provides a comprehensive history of queries executed in
+      the Snowflake account, including query details, execution metrics, and resource
+      utilization.
+    base_table:
+      database: SNOWFLAKE
+      schema: ACCOUNT_USAGE
+      table: QUERY_HISTORY
+    dimensions:
+      - name: QUERY_ID
+        synonyms:
+          - 'STATEMENT_ID'
+        description: Unique identifier for each query in the query history.
+        expr: QUERY_ID
+        data_type: TEXT
+      - name: QUERY_TEXT
+        synonyms:
+          - 'SQL text'
+        description: "All matches on this field should use ilike with wildcards.  Example where <value> is the requested filter value:  WHERE QUERY_TEXT ILIKE '%<value>%'"
+        expr: QUERY_TEXT
+        data_type: TEXT
+      - name: DATABASE_NAME
+        synonyms:
+          - CATALOG
+          - CATALOG_NAME
+          - TABLE_CATALOG_NAME
+        description:  database names that have executed queries in the query history, use ilike
+        expr: DATABASE_NAME
+        data_type: TEXT
+        sample_values:
+          - CRM_DB
+          - CITIBIKE
+          - FROSTBYTE_SAFEGRAPH
+          - LLMDB
+          - KAFKA_DB
+          - IMDB
+          - STREAMDB
+          - SNOWPIPE_STREAMING
+          - WEATHER
+          - SNOWFLAKE
+      - name: SCHEMA_NAME
+        synonyms:
+          - 'TABLE_SCHEMA'
+        description: The name of the schema that owns the query. use ilike operator
+        expr: SCHEMA_NAME
+        data_type: TEXT
+        sample_values:
+          - ANALYST
+          - TPCDS_SF10TCL
+          - ACCOUNT_USAGE
+          - TPCH_SF1
+          - CORTEX
+          - DEMO
+          - KAFKA_SCHEMA
+          - PUBLIC
+
+      - name: QUERY_TYPE
+        synonyms:
+          - 'STATEMENT_TYPE'
+        description: "All matches on this field should use ilike with wildcards as specified in this example where <value> is the requested filter value:  WHERE query_type ILIKE '%<value>%'"
+        expr: QUERY_TYPE
+        data_type: TEXT
+        sample_values:
+          - UPDATE
+          - ROLLBACK
+          - REFRESH_DYNAMIC_TABLE_AT_REFRESH_VERSION
+          - USE
+          - TRUNCATE_TABLE
+          - CREATE_TABLE
+          - EXECUTE_TASK
+          - ALTER_WAREHOUSE_RESUME
+          - CREATE_USER
+          - UNKNOWN
+          - ALTER
+          - EXPLAIN
+          - EXECUTE_STREAMLIT
+          - ALTER_ACCOUNT
+          - ALTER_USER
+          - ALTER_AUTO_RECLUSTER
+          - ALTER_SET_TAG
+          - SELECT
+          - DROP_STREAM
+          - DROP_TASK
+          - LIST_FILES
+          - COPY
+          - DELETE
+          - CREATE_ROLE
+          - PUT_FILES
+
+      - name: USER_NAME
+        synonyms:
+          - '  '
+        description: "user name with All matches on this field should use ilike with wildcards.  Example where <value> is the requested filter value:  WHERE user_name ILIKE '%<value>%'"
+        expr: USER_NAME
+        data_type: TEXT
+        sample_values:
+          - SYSTEM
+          - KAFKA_USER
+          - UPATEL
+          - RSAUSER
+      - name: ROLE_NAME
+        synonyms:
+          - '  '
+        description: Role Names assigned to users in the Snowflake account.
+        expr: ROLE_NAME
+        data_type: TEXT
+        sample_values:
+          - SECURITYADMIN
+          - SYSADMIN
+          - USERADMIN
+          - PUBLIC
+          - KAFKA_CONNECTOR_ROLE_1
+          - ACCOUNTADMIN
+      - name: WAREHOUSE_NAME
+        synonyms:
+          - '  '
+        description: "warehouse names used in query history. All matches on this field should use ilike with wildcards.  Example where <value> is the requested filter value:  WHERE warehouse_name ILIKE '%<value>%'"
+        expr: WAREHOUSE_NAME
+        data_type: TEXT
+        sample_values:
+          - DEMO_WH
+          - COMPUTE_WH
+          - CRM_WH
+          - TASTY_DE_WH
+          - USER_WH
+
+      - name: WAREHOUSE_SIZE
+        synonyms:
+          - '  '
+        description: "Warehouse size All matches on this field should use ilike with wildcards.  Example where <value> is the requested filter value:  WHERE warehouse_Size ILIKE '<value>%'"
+        expr: WAREHOUSE_SIZE
+        data_type: TEXT
+        sample_values:
+          - X-Small
+          - X-Large
+          - Large
+          - Medium
+          - Small
+          - 4X-Large
+          - 2X-Large
+
+      - name: WAREHOUSE_TYPE
+        synonyms:
+          - '  '
+        description: "Warehouse type, indicating the type of warehouse used for the Example where <value> is the requested filter value:  WHERE warehouse_type  ILIKE '%<value>%'"
+        expr: WAREHOUSE_TYPE
+        data_type: TEXT
+        sample_values:
+          - None
+          - STANDARD
+          - SNOWPARK-OPTIMIZED
+
+      - name: QUERY_TAG
+        synonyms:
+          - '  '
+        description: '  '
+        expr: QUERY_TAG
+        data_type: TEXT
+
+      - name: EXECUTION_STATUS
+        synonyms:
+          - '  '
+        description: The execution status of the query, indicating whether it was
+          successful, failed, or encountered an incident.
+        expr: EXECUTION_STATUS
+        data_type: TEXT
+        sample_values:
+          - SUCCESS
+          - FAIL
+          - INCIDENT
+      - name: ERROR_CODE
+        synonyms:
+          - '  '
+        description: Error codes encountered during query execution.
+        expr: ERROR_CODE
+        data_type: TEXT
+        sample_values:
+          - None
+          - '000904'
+          - '001138'
+          - '002211'
+          - '002002'
+          - '090064'
+          - '002263'
+          - '000711'
+          - '002126'
+          - '002014'
+          - '100037'
+          - '391521'
+          - '-20000'
+          - '100038'
+          - '100205'
+          - '000606'
+          - '000603'
+          - '093083'
+          - '394207'
+          - '391811'
+          - '503003'
+          - '002023'
+          - '391546'
+          - '090207'
+          - '002049'
+      - name: ERROR_MESSAGE
+        synonyms:
+          - '  '
+        description: '  '
+        expr: ERROR_MESSAGE
+        data_type: TEXT
+
+      - name: OUTBOUND_DATA_TRANSFER_CLOUD
+        synonyms:
+          - '  '
+        description: Outbound data transfer to AWS cloud storage.
+        expr: OUTBOUND_DATA_TRANSFER_CLOUD
+        data_type: TEXT
+        sample_values:
+          - None
+          - AWS
+      - name: OUTBOUND_DATA_TRANSFER_REGION
+        synonyms:
+          - '  '
+        description: Region for outbound data transfer.
+        expr: OUTBOUND_DATA_TRANSFER_REGION
+        data_type: TEXT
+        sample_values:
+          - None
+          - us-west-2
+      - name: RELEASE_VERSION
+        synonyms:
+          - '  '
+        description: Release versions of the database.
+        expr: RELEASE_VERSION
+        data_type: TEXT
+        sample_values:
+          - 7.29.1
+          - 7.44.2
+          - 8.3.1
+          - 8.0.0
+      - name: IS_CLIENT_GENERATED_STATEMENT
+        synonyms:
+          - '  '
+        description: Indicates whether the statement was generated by the client or
+          not.
+        expr: IS_CLIENT_GENERATED_STATEMENT
+        data_type: BOOLEAN
+        sample_values:
+          - 'False'
+      - name: QUERY_HASH
+        synonyms:
+          - '  '
+        description: Unique identifier for each query, used to track query performance
+          and history.
+        expr: QUERY_HASH
+        data_type: TEXT
+
+      - name: QUERY_PARAMETERIZED_HASH
+        synonyms:
+          - '  '
+        description: Unique hash values for query parameters.
+        expr: QUERY_PARAMETERIZED_HASH
+        data_type: TEXT
+
+      - name: QUERY_RETRY_CAUSE
+        synonyms:
+          - '  '
+        description: Reason for query retry.
+        expr: QUERY_RETRY_CAUSE
+        data_type: TEXT
+
+    time_dimensions:
+      - name: START_TIME
+        synonyms:
+          - '  '
+        description: Start time of the query.
+        expr: START_TIME
+        data_type: TIMESTAMP_LTZ
+
+      - name: END_TIME
+        synonyms:
+          - '  '
+        description: End time of query execution.
+        expr: END_TIME
+        data_type: TIMESTAMP_LTZ
+
+    measures:
+      - name: SESSION_ID
+        synonyms:
+          - '  '
+        description: Unique identifier for each session in the query history.
+        expr: SESSION_ID
+        data_type: NUMBER
+
+
+      - name: CLUSTER_NUMBER
+        synonyms:
+          - '  '
+        description: Cluster Number
+        expr: CLUSTER_NUMBER
+        data_type: NUMBER
+        sample_values:
+          - None
+          - '2'
+          - '1'
+      - name: TOTAL_ELAPSED_TIME
+        synonyms:
+          - '  '
+        description: Total elapsed time in seconds for the query.
+        expr: TOTAL_ELAPSED_TIME
+        default_aggregation : avg
+        data_type: NUMBER
+
+
+      - name: BYTES_SCANNED
+        synonyms:
+          - '  '
+        description: Total bytes scanned during query execution.
+        expr: BYTES_SCANNED
+        default_aggregation: sum
+        data_type: NUMBER
+
+
+      - name: ROWS_PRODUCED
+        synonyms:
+          - '  '
+        description: Number of rows produced by the query.
+        expr: ROWS_PRODUCED
+        default_aggregation: sum
+        data_type: NUMBER
+
+      - name: COMPILATION_TIME
+        synonyms:
+          - '  '
+        description: Compilation time in seconds.
+        expr: COMPILATION_TIME
+        default_aggregation: sum
+        data_type: NUMBER
+
+      - name: EXECUTION_TIME
+        synonyms:
+          - '  '
+        description: Execution Time in seconds.
+        expr: EXECUTION_TIME
+        default_aggregation: avg
+        data_type: NUMBER
+
+      - name: QUEUED_PROVISIONING_TIME
+        synonyms:
+          - '  '
+        description: The time in seconds that the provisioning operation was queued.
+        expr: QUEUED_PROVISIONING_TIME
+        data_type: NUMBER
+      - name: QUEUED_REPAIR_TIME
+        synonyms:
+          - '  '
+        description: Time spent queuing for a repair operation.
+        expr: QUEUED_REPAIR_TIME
+        data_type: NUMBER
+
+      - name: QUEUED_OVERLOAD_TIME
+        synonyms:
+          - '  '
+        description: Total time in seconds that the query was queued due to overload.
+        expr: QUEUED_OVERLOAD_TIME
+        data_type: NUMBER
+
+      - name: TRANSACTION_BLOCKED_TIME
+        synonyms:
+          - '  '
+        description: Time spent waiting for a transaction to be processed due to blocking.
+        expr: TRANSACTION_BLOCKED_TIME
+        data_type: NUMBER
+      - name: OUTBOUND_DATA_TRANSFER_BYTES
+        synonyms:
+          - '  '
+        description: Total bytes transferred out of the database for data transfer
+          operations.
+        expr: OUTBOUND_DATA_TRANSFER_BYTES
+        data_type: NUMBER
+        default_aggregation: sum
+
+      - name: INBOUND_DATA_TRANSFER_BYTES
+        synonyms:
+          - '  '
+        description: Total bytes transferred for inbound data transfers.
+        expr: INBOUND_DATA_TRANSFER_BYTES
+        data_type: NUMBER
+        default_aggregation: sum
+
+      - name: EXTERNAL_FUNCTION_TOTAL_INVOCATIONS
+        synonyms:
+          - '  '
+        description: Total number of invocations of external functions.
+        expr: EXTERNAL_FUNCTION_TOTAL_INVOCATIONS
+        data_type: NUMBER
+
+      - name: EXTERNAL_FUNCTION_TOTAL_SENT_ROWS
+        synonyms:
+          - '  '
+        description: Total number of rows sent by external functions.
+        expr: EXTERNAL_FUNCTION_TOTAL_SENT_ROWS
+        data_type: NUMBER
+      - name: EXTERNAL_FUNCTION_TOTAL_RECEIVED_ROWS
+        synonyms:
+          - '  '
+        description: Total number of rows received from external functions.
+        expr: EXTERNAL_FUNCTION_TOTAL_RECEIVED_ROWS
+        data_type: NUMBER
+
+      - name: EXTERNAL_FUNCTION_TOTAL_SENT_BYTES
+        synonyms:
+          - '  '
+        description: Total bytes sent by external functions.
+        expr: EXTERNAL_FUNCTION_TOTAL_SENT_BYTES
+        data_type: NUMBER
+      - name: EXTERNAL_FUNCTION_TOTAL_RECEIVED_BYTES
+        synonyms:
+          - '  '
+        description: Total bytes received by external functions.
+        expr: EXTERNAL_FUNCTION_TOTAL_RECEIVED_BYTES
+        data_type: NUMBER
+      - name: QUERY_HASH_VERSION
+        synonyms:
+          - '  '
+        description: Query hash version.
+        expr: QUERY_HASH_VERSION
+        data_type: NUMBER
+      - name: QUERY_PARAMETERIZED_HASH_VERSION
+        synonyms:
+          - '  '
+        description: Query Parameterized Hash Version
+        expr: QUERY_PARAMETERIZED_HASH_VERSION
+        data_type: NUMBER
+
+      - name: QUERY_ACCELERATION_BYTES_SCANNED
+        synonyms:
+          - '  '
+        description: Bytes Scanned by the Query Accelerator
+        expr: QUERY_ACCELERATION_BYTES_SCANNED
+        data_type: NUMBER
+      - name: QUERY_ACCELERATION_PARTITIONS_SCANNED
+        synonyms:
+          - '  '
+        description: Number of query acceleration partitions scanned.
+        expr: QUERY_ACCELERATION_PARTITIONS_SCANNED
+        data_type: NUMBER
+
+      - name: QUERY_ACCELERATION_UPPER_LIMIT_SCALE_FACTOR
+        synonyms:
+          - '  '
+        description: Query Acceleration Upper Limit Scale Factor for queries.
+        expr: QUERY_ACCELERATION_UPPER_LIMIT_SCALE_FACTOR
+        data_type: NUMBER
+      - name: BYTES_WRITTEN_TO_RESULT
+        synonyms:
+          - '  '
+        description: Total number of bytes written to the result set.
+        expr: BYTES_WRITTEN_TO_RESULT
+        data_type: NUMBER
+      - name: ROWS_WRITTEN_TO_RESULT
+        synonyms:
+          - '  '
+        description: Number of rows written to the result set.
+        expr: ROWS_WRITTEN_TO_RESULT
+        data_type: NUMBER
+      - name: ROWS_INSERTED
+        synonyms:
+          - 'RECORD_INSERTED'
+          - 'ROWS_CREATED'
+        description: Number of rows inserted.
+        expr: ROWS_INSERTED
+        data_type: NUMBER
+        default_aggregation: sum
+      - name: QUERY_RETRY_TIME
+        synonyms:
+          - 'STATEMENT_RETRY_TIME'
+        description: Time in seconds since the query was last retried.
+        expr: QUERY_RETRY_TIME
+        data_type: NUMBER
+      - name: FAULT_HANDLING_TIME
+        synonyms:
+          - '  '
+        description: The time taken by the database to handle a fault or error.
+        expr: FAULT_HANDLING_TIME
+        data_type: NUMBER
