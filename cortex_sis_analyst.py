@@ -58,26 +58,13 @@ image_string = f'data:image/{mime_type};base64,{content_b64encoded}'
 st.image(image_string, width = 600)
 
 
-DATABASE = "LLMDB"
-SCHEMA = "ANALYST"
+DATABASE = "YOURDB"
+SCHEMA = "YOURSCHEMA"
 STAGE = "yaml_files"
-#FILE = "revenue_timeseries.yaml"
+FILE = "cortex_account_usage.yaml"
 FULLPATH = f"{DATABASE}.{SCHEMA}.{STAGE}"
 user_input=""
 
-def get_files(_sess):
-   _sess.sql("ALTER STAGE "+FULLPATH+" REFRESH").collect()
-   return _sess.sql(
-       """SELECT * FROM DIRECTORY('@llmdb.analyst.yaml_files') 
-       WHERE RELATIVE_PATH ILIKE '%.yaml' ORDER BY RELATIVE_PATH ASC"""
-   ).to_pandas()
-
-# Show table of files
-fdf = get_files(session)
-#st.dataframe(fdf)
-
-# Drop down to select a PDF
-FILE = st.selectbox('Choose Semantic Model', fdf['RELATIVE_PATH'] )
 
 def send_message(prompt: str) -> dict:
     """Calls the REST API and returns the response."""
