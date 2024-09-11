@@ -8,6 +8,17 @@ from typing import (List)
 
 session = get_active_session()
 
+
+DATABASE = "YOURDB"
+SCHEMA = "YOURSCHEMA"
+STAGE = "yaml_files"
+FILE = "cortex_account_usage.yaml"
+FULLPATH = f"{DATABASE}.{SCHEMA}.{STAGE}"
+user_input=""
+
+
+st.set_page_config(layout="wide")
+
 def stylable_container(key: str, css_styles:  List[str]) -> "DeltaGenerator":
     # Sanitize key
     key = key.replace(" ", "-").lower()
@@ -44,26 +55,6 @@ div[data-testid="stMarkdownContainer"] > p > span.{key}) {style}
     container.markdown(style_text, unsafe_allow_html=True)
     return container
 
-
-st.set_page_config(
-    layout="wide")
-
-image_name = 'Snowflake_Logo.png'
-session.file.get(f"@llmdb.analyst.yaml_files/{image_name}", f"/tmp")
-mime_type = image_name.split('.')[-1:][0].lower()        
-with open(f"/tmp/"+image_name, "rb") as f:
-    content_bytes = f.read()
-content_b64encoded = base64.b64encode(content_bytes).decode()
-image_string = f'data:image/{mime_type};base64,{content_b64encoded}'
-st.image(image_string, width = 600)
-
-
-DATABASE = "YOURDB"
-SCHEMA = "YOURSCHEMA"
-STAGE = "yaml_files"
-FILE = "cortex_account_usage.yaml"
-FULLPATH = f"{DATABASE}.{SCHEMA}.{STAGE}"
-user_input=""
 
 
 def send_message(prompt: str) -> dict:
