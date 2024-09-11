@@ -8,11 +8,15 @@ from typing import (List)
 
 session = get_active_session()
 
-
+#update following lines 
 DATABASE = "YOURDB"
 SCHEMA = "YOURSCHEMA"
 STAGE = "yaml_files"
 FILE = "cortex_account_usage.yaml"
+
+
+# end of update
+
 FULLPATH = f"{DATABASE}.{SCHEMA}.{STAGE}"
 user_input=""
 
