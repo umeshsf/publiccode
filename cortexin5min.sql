@@ -26,6 +26,8 @@ grant CREATE APPLICATION PACKAGE on account to role identifier($role_name);
 grant CREATE APPLICATION on account to role identifier($role_name);
 grant IMPORT SHARE on account to role identifier($role_name);
 
+GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE TO ROLE identifier($role_name);
+
 -- control who you want to use cortex
 GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE PUBLIC;
 
