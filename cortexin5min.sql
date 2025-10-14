@@ -60,7 +60,7 @@ create or replace warehouse identifier($warehouse_name)
 
 GRANT CREATE AGENT ON SCHEMA SNOWFLAKE_INTELLIGENCE.AGENTS TO role identifier($role_name) ;
 
-alter user USER set
+alter user identifier($current_user) set
     DEFAULT_ROLE = cortex_role, 
     DEFAULT_WAREHOUSE = cortex_wh;
 
