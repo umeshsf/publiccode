@@ -354,7 +354,7 @@ FROM SPECIFICATION $$
             "semantic_view": "SNOWFLAKE_INTELLIGENCE.TOOLS.COST_PERFORMANCE_ASSISTANT_SVW",
             "execution_environment": {
                 "type": "warehouse",
-                "warehouse": "cortex_wh",
+                "warehouse": "CORTEX_WH",
                 "query_timeout": 60
               }
         },
