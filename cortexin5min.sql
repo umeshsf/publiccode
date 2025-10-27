@@ -40,7 +40,7 @@ call snowflake.models.cortex_base_models_refresh();
 -- if you do not see all the model run above command to do modelrefresh
 SHOW APPLICATION ROLES  like '%model%' IN APPLICATION SNOWFLAKE ;
 -- control which model to  use by whom, using following as example
-grant application role SNOWFLAKE."CORTEX-MODEL-ROLE-ALL" to role  identifier($role_name);
+-- grant application role SNOWFLAKE."CORTEX-MODEL-ROLE-ALL" to role  identifier($role_name);
 
 use role identifier($role_name);
 -- main cortex database, DO NOT CHANGE NAME
