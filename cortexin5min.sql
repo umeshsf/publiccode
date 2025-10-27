@@ -364,7 +364,7 @@ FROM SPECIFICATION $$
             "type": "procedure",            
             "execution_environment": {
                 "type": "warehouse",
-                "warehouse": "cortex_wh",
+                "warehouse": "CORTEX_WH",
                 "query_timeout": 60
               }
         }        
