@@ -69,6 +69,15 @@ AUTO_RESUME = TRUE;
 
 use schema identifier($cortex_schema);
 
+CREATE OR REPLACE NETWORK RULE wideopen_network_rule
+  MODE = EGRESS
+  TYPE = HOST_PORT
+  VALUE_LIST = ('0.0.0.0:80', '0.0.0.0:443');
+
+CREATE OR REPLACE EXTERNAL ACCESS INTEGRATION SI_ExternalAccess_int
+ALLOWED_NETWORK_RULES = (wideopen_network_rule)
+ENABLED = true;  
+
 create or replace semantic view 
     COST_PERFORMANCE_ASSISTANT_SVW
  tables (
