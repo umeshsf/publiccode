@@ -1,4 +1,16 @@
 use role accountadmin;
+
+-- this is the email for your account user
+set email_address='your_valid_email_address';
+-- YOUR CUSTOM ROLE, WAREHOUSE, DB , SCHEMA
+set role_name='cortex_role';
+set warehouse_name = 'cortex_wh';
+set cortex_db = 'cortex';
+-- this is where all semantic view, cortex search, agent, SI and mcp server objects are located
+set cortex_tools='tools';
+set cortex_schema =  $cortex_db||'.'||$cortex_tools;
+set current_user=current_user();
+
 -- to get access to all the models to use
 ALTER ACCOUNT SET CORTEX_ENABLED_CROSS_REGION = 'ANY_REGION' ;
 -- enable cortex analyst
@@ -8,13 +20,15 @@ ALTER ACCOUNT SET ENABLE_CORTEX_ANALYST = TRUE;
 CREATE DATABASE IF NOT EXISTS SNOWFLAKE_SAMPLE_DATA FROM SHARE SFC_SAMPLES.SAMPLE_DATA;
 GRANT IMPORTED PRIVILEGES ON DATABASE snowflake_sample_data  TO ROLE public;
 
--- YOUR CUSTOM ROLE FOR CORTEX ADMIN
-set role_name='cortex_role';
-set warehouse_name = 'cortex_wh';
-set current_user=current_user();
+
+
+
+-- set verified email
+ALTER USER USER SET EMAIL = $email_address;
+SELECT SYSTEM$START_USER_EMAIL_VERIFICATION($current_user);
 
 create role if not exists identifier($role_name);
-grant role identifier($role_name)  to role accountadmin;
+grant role identifier($role_name)  to role sysadmin;
 GRANT ROLE identifier($role_name) TO USER IDENTIFIER($current_user);
 
 grant create database on account to role identifier($role_name);
@@ -25,51 +39,38 @@ grant CREATE INTEGRATION on account to role identifier($role_name);
 grant CREATE APPLICATION PACKAGE on account to role identifier($role_name);
 grant CREATE APPLICATION on account to role identifier($role_name);
 grant IMPORT SHARE on account to role identifier($role_name);
-
 GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE TO ROLE identifier($role_name);
-
 -- control who you want to use cortex
 GRANT DATABASE ROLE SNOWFLAKE.CORTEX_USER TO ROLE PUBLIC;
-
--- show models
-show models in schema snowflake.models;
-
--- to refresh all modesl use it , it will take few minutes to refresh
-call snowflake.models.cortex_base_models_refresh();
-
--- if you do not see all the model run above command to do modelrefresh
-SHOW APPLICATION ROLES  like '%model%' IN APPLICATION SNOWFLAKE ;
--- control which model to  use by whom, using following as example
--- grant application role SNOWFLAKE."CORTEX-MODEL-ROLE-ALL" to role  identifier($role_name);
+GRANT CREATE SNOWFLAKE INTELLIGENCE ON ACCOUNT TO ROLE identifier($role_name);
+GRANT IMPORTED PRIVILEGES ON DATABASE snowflake  TO ROLE identifier($role_name);
 
 use role identifier($role_name);
 -- main cortex database, DO NOT CHANGE NAME
-CREATE DATABASE IF NOT EXISTS snowflake_intelligence;
---for agents used by Snowflake Intelligence
-CREATE SCHEMA IF NOT EXISTS snowflake_intelligence.agents;
--- for tools used by agents
-CREATE SCHEMA IF NOT EXISTS snowflake_intelligence.tools;
--- Allow anyone to see the agents in this schema
--- Please note that we are granting access to the public role,  so all users can see  the agents
-GRANT USAGE ON DATABASE snowflake_intelligence TO ROLE PUBLIC;
-GRANT USAGE ON SCHEMA snowflake_intelligence.agents TO ROLE PUBLIC;
-GRANT USAGE ON SCHEMA snowflake_intelligence.tools TO ROLE PUBLIC;
+CREATE DATABASE IF NOT EXISTS identifier($cortex_db);
+--for agents and tools used by Snowflake Intelligence
+CREATE SCHEMA IF NOT EXISTS identifier($cortex_schema);
+
+-- grant role just in case if it exists  owner role
+
+GRANT USAGE ON DATABASE CORTEX TO ROLE identifier($role_name);
+GRANT USAGE ON SCHEMA identifier($cortex_schema) TO ROLE identifier($role_name);
+GRANT CREATE AGENT ON SCHEMA identifier($cortex_schema) TO role identifier($role_name) ;
+
+
 
 create or replace warehouse identifier($warehouse_name) 
-    AUTO_SUSPEND = 60;
-
-GRANT CREATE AGENT ON SCHEMA SNOWFLAKE_INTELLIGENCE.AGENTS TO role identifier($role_name) ;
-
-alter user identifier($current_user) set
-    DEFAULT_ROLE = cortex_role, 
-    DEFAULT_WAREHOUSE = cortex_wh;
+WAREHOUSE_SIZE = LARGE
+RESOURCE_CONSTRAINT = STANDARD_GEN_2
+AUTO_SUSPEND = 300
+AUTO_RESUME = TRUE;
 
 
-use role cortex_role;
-use snowflake_intelligence.tools;
+
+use schema identifier($cortex_schema);
 
 create or replace semantic view 
-    SNOWFLAKE_INTELLIGENCE.TOOLS.COST_PERFORMANCE_ASSISTANT_SVW
+    COST_PERFORMANCE_ASSISTANT_SVW
  tables (
   SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY,
   SNOWFLAKE.ACCOUNT_USAGE.QUERY_ATTRIBUTION_HISTORY
@@ -183,7 +184,7 @@ create or replace notification integration email_integration
   default_subject = 'snowflake intelligence'
 ;
 
-create or replace procedure snowflake_intelligence.tools.send_email(
+create or replace procedure send_email(
     recipient_email varchar,
     subject varchar,
     body varchar
@@ -216,10 +217,7 @@ def send_email(session, recipient_email, subject, body):
         return f"Error sending email: {str(e)}"
 $$;
 
-call snowflake_intelligence.tools.send_email(
-  'umesh.patel@snowflake.com',
-  'Cortex Email',
-  'This is testing of email from Snowflake');
+
 
 
 -- accept terms
@@ -231,10 +229,11 @@ create or replace database IDENTIFIER('"SNOWFLAKE_DOCUMENTATION"')
 GRANT IMPORTED PRIVILEGES ON DATABASE SNOWFLAKE_DOCUMENTATION  
     TO ROLE PUBLIC;
 
+    
+use schema identifier($cortex_schema);
 
-use role cortex_role;
-use snowflake_intelligence.agents;
-CREATE or REPLACE AGENT SNOWFLAKE_INTELLIGENCE.AGENTS.SNOWFLAKE_COSTPERFORMANCE_AGENT
+
+CREATE or REPLACE AGENT SNOWFLAKE_COSTPERFORMANCE_AGENT
 WITH PROFILE='{ "display_name": "Snowflake Cost Performance Agent" }'
     COMMENT=$$ I am your Snowflake Cost Performance Assistant, designed to help you optimize query
 performance and resolve performance challenges. I analyze your actual query history
@@ -351,20 +350,20 @@ FROM SPECIFICATION $$
             "name": "SNOWFLAKE_DOCUMENTATION.SHARED.CKE_SNOWFLAKE_DOCS_SERVICE"            
         },
         "cost_performance_assistant_semantic_view": {
-            "semantic_view": "SNOWFLAKE_INTELLIGENCE.TOOLS.COST_PERFORMANCE_ASSISTANT_SVW",
+            "semantic_view": "cortex.TOOLS.COST_PERFORMANCE_ASSISTANT_SVW",
             "execution_environment": {
                 "type": "warehouse",
-                "warehouse": "CORTEX_WH",
+                "warehouse": "cortex_wh",
                 "query_timeout": 60
               }
         },
         "cortex_email": {
-            "identifier":"snowflake_intelligence.tools.send_email",
+            "identifier":"cortex.tools.send_email",
             "name":"SEND_EMAIL(VARCHAR, VARCHAR, VARCHAR)",
             "type": "procedure",            
             "execution_environment": {
                 "type": "warehouse",
-                "warehouse": "CORTEX_WH",
+                "warehouse": "cortex_wh",
                 "query_timeout": 60
               }
         }        
@@ -372,8 +371,28 @@ FROM SPECIFICATION $$
 }
 $$;
 
--- review all tools and agent using following commands
 
-show semantic views in database snowflake_intelligence;
-show cortex search services in database snowflake_documentation;
-show agents in database snowflake_intelligence;
+CREATE SNOWFLAKE INTELLIGENCE if not exists demo_cortex_si;
+ALTER SNOWFLAKE INTELLIGENCE demo_cortex_si ADD AGENT SNOWFLAKE_COSTPERFORMANCE_AGENT;
+
+
+--test it
+
+/*
+use role identifier($role_name);
+use schema identifier($cortex_schema);
+
+-- check your email before running below and verify email address
+
+call send_email(
+  $email_address,
+  'Cortex Email',
+  'This is testing of email from Snowflake');
+
+
+show agents;
+show semantic views;
+show procedures in schema identifier($cortex_schema);
+show snowflake intelligences;
+
+*/
