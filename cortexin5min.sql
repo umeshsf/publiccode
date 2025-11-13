@@ -24,7 +24,7 @@ GRANT IMPORTED PRIVILEGES ON DATABASE snowflake_sample_data  TO ROLE public;
 
 
 -- set verified email
-ALTER USER USER SET EMAIL = $email_address;
+ALTER USER  IDENTIFIER($current_user)  SET EMAIL = $email_address;
 SELECT SYSTEM$START_USER_EMAIL_VERIFICATION($current_user);
 
 create role if not exists identifier($role_name);
