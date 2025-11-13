@@ -414,3 +414,82 @@ CREATE OR REPLACE API INTEGRATION git_api_integration
 
 
 */
+
+
+-- create MCP Server
+
+CREATE OR REPLACE MCP SERVER snowflake_mcp_server FROM SPECIFICATION
+$$
+            tools:
+              - name: "Snowflake Documentation Search"
+                identifier: "SNOWFLAKE_DOCUMENTATION.SHARED.CKE_SNOWFLAKE_DOCS_SERVICE"
+                type: "CORTEX_SEARCH_SERVICE_QUERY"
+                description: "Tool for Snowflake documentation and code help."
+                title: "Snowflake Documentation"
+              - name: "query_semanctic_view"
+                type: "CORTEX_ANALYST_MESSAGE"
+                identifier: "CORTEX.TOOLS.COST_PERFORMANCE_ASSISTANT_SVW"
+                description: "Semantic view for all queries executed in Snowflake"
+                title: "Snowflake Query History"
+                config:
+                    warehouse: "cortex_wh"
+              - title: "Agent V1"
+                identifier: "sales_intelligence.tools.SNOWFLAKE_COSTPERFORMANCE_AGENT"
+                name: "cost_optimizer_agent"
+                type: "CORTEX_AGENT_RUN"
+                description: "AGent to guide optimize code reduce cost"
+              - title: "SQL Execution"
+                name: "sql_exec_tool"
+                type: "SYSTEM_EXECUTE_SQL"
+                description: "execute sql queries against the connected Snowflake "
+                config:
+                 warehouse: CORTEX_WH
+            $$;
+
+
+-- create PAT Token to use with mcp url
+
+
+ALTER USER IF EXISTS IDENTIFIER($current_user) ADD PROGRAMMATIC ACCESS TOKEN token_for_mcp
+ROLE_RESTRICTION = 'CORTEX_ROLE';
+-- note down the token value, it displays only once 
+
+/*
+-- url change based on your database name and schema name kin below e.g cortex, tools
+
+curl -X POST "https://orgname-accountname.snowflakecomputing.com/api/v2/databases/cortex/schemas/tools/mcp-servers/snowflake_mcp_server" 
+  --header 'Content-Type: application/json' 
+  --header 'Accept: application/json' 
+  --header "Authorization: Bearer xxxxx---PAT  TOKEN  xxxxxx" --data '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {}
+  }'
+
+  curl -X POST "https://orgname-accountname.snowflakecomputing.com/api/v2/databases/cortex/schemas/tools/mcp-servers/snowflake_mcp_server" 
+  --header 'Content-Type: application/json' 
+  --header 'Accept: application/json' 
+  --header "Authorization: Bearer xxxxxxxx" --data '{
+    "jsonrpc": "2.0",
+    "id": 2,
+    "method": "tools/list",
+    "params": {}
+  }'
+
+ curl -X POST "https://orgname-accountname.snowflakecomputing.com/api/v2/databases/cortex/schemas/tools/mcp-servers/snowflake_mcp_server" \
+  --header 'Content-Type: application/json' \
+  --header 'Accept: application/json' \
+  --header "Authorization: Bearer xxxxxxxx" \
+  --data '{
+    "jsonrpc": "2.0",
+    "id": 12345,
+    "method": "tools/call",
+    "params": {
+        "name": "Snowflake Documentation Search",
+        "arguments": {
+            "query": "How to create hybrid table?"
+        }
+    }
+  }'
+*/
