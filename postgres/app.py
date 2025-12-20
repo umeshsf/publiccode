@@ -14,7 +14,7 @@ DEFAULT_POSTGRES_USERNAME = "snowflake_admin"
 DEFAULT_POSTGRES_PUBLICATION_NAME = "retail_openflow_sync"
 
 # Destination Parameters Defaults
-DEFAULT_SNOWFLAKE_ACCOUNT_ID = "sfsenorthamerica-yourdemo"
+DEFAULT_SNOWFLAKE_ACCOUNT_ID = "myorg-sf-accountname"
 DEFAULT_SNOWFLAKE_USERNAME = "your_userid"
 DEFAULT_SNOWFLAKE_ROLE = "sysadmin"
 DEFAULT_SNOWFLAKE_WAREHOUSE = "COMPUTE_WH"
