@@ -61,7 +61,7 @@ GRANT CREATE AGENT ON SCHEMA identifier($cortex_schema) TO role identifier($role
 
 create or replace warehouse identifier($warehouse_name) 
 WAREHOUSE_SIZE = LARGE
-RESOURCE_CONSTRAINT = STANDARD_GEN_2
+GENERATION = 2
 AUTO_SUSPEND = 300
 AUTO_RESUME = TRUE;
 
@@ -381,11 +381,11 @@ FROM SPECIFICATION $$
 $$;
 
 
-CREATE SNOWFLAKE INTELLIGENCE if not exists demo_cortex_si;
-ALTER SNOWFLAKE INTELLIGENCE demo_cortex_si ADD AGENT SNOWFLAKE_COSTPERFORMANCE_AGENT;
 
 
 --test it
+
+-- Login to SnowWork and use agent Snowflake Cost Pprformance Agent.
 
 /*
 use role identifier($role_name);
@@ -402,7 +402,7 @@ call send_email(
 show agents;
 show semantic views;
 show procedures in schema identifier($cortex_schema);
-show snowflake intelligences;
+
 
 
 -- you can create to this repo and create snowsight workspace using this repo
@@ -415,7 +415,7 @@ CREATE OR REPLACE API INTEGRATION git_api_integration
 
 */
 
-
+-- Optional 
 -- create MCP Server
 
 CREATE OR REPLACE MCP SERVER snowflake_mcp_server FROM SPECIFICATION
